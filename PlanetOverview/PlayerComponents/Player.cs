@@ -7,5 +7,6 @@ namespace PlanetOverview.PlayerComponents
     public class Player
     {
         public string Name { get; set; }
+        public int Credits { get; set; }
     }
 }

@@ -6,15 +6,12 @@ using System.Text;
 namespace PlanetOverview.PlanetComponents
 {
     /// <summary>
-    /// Super class for the space to contain units from the game
+    /// Class for the ground tiles on the planet.
+    /// Contains one unit
     /// </summary>
+    /// TODO link to planet location. Add additional features if needed
     public class Tile
     {
-        public List<Unit> Units { get; set; }
-
-        public Tile()
-        {
-            Units = new List<Unit>();
-        }
+        public Unit Unit { get; set; }
     }
 }

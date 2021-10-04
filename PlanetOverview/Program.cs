@@ -16,10 +16,10 @@ namespace PlanetOverview
 
             // Create sample players
             List<Player> players = new List<Player>();
-            Player empire = new Player() { Name = "Empire" };
+            Player empire = new Player() { Name = "Empire", Credits = 10000 };
             players.Add(empire);
-            Player rebellion = new Player() { Name = "Rebellion" };
-            players.Add(new Player() { Name = "Rebellion" });
+            Player rebellion = new Player() { Name = "Rebellion", Credits = 10000 };
+            players.Add(rebellion);
             //players.Add(new Player() { Name = "Neutral" }); try with neutral as null
 
             // Create structures
@@ -30,16 +30,40 @@ namespace PlanetOverview
             Structure rebellionFactory = new Structure() { Name = "Rebellion Factory" };
 
             // Create units
-            Unit stormTrooper = new Unit() { Name = "Storm Trooper" };
-            Unit atSt = new Unit() { Name = "AT-ST" };
+            // TODO load this from an xml file.
+            Unit stormTrooper = new Unit()
+            { 
+                Name = "Storm Trooper",
+                BuildEffortCost = 50,
+                Cost = 50,
+            };
+            Unit atSt = new Unit()
+            { 
+                Name = "AT-ST",
+                BuildEffortCost = 150,
+                Cost = 150,
+            };
 
-            Unit starDestroyer = new Unit() { Name = "Star destroyer" };
+            Unit starDestroyer = new Unit()
+            { 
+                Name = "Star destroyer",
+                BuildEffortCost = 1000,
+                Cost = 4000,
+            };
             
-            Unit rebelSoldier = new Unit() { Name = "Rebel Trooper" };
+            Unit rebelSoldier = new Unit()
+            { 
+                Name = "Rebel Trooper",
+                BuildEffortCost = 45,
+                Cost = 40,
+            };
 
-            Unit xWing = new Unit() { Name = "X-Wing" };
-
-
+            Unit xWing = new Unit()
+            { 
+                Name = "X-Wing",
+                BuildEffortCost = 150,
+                Cost = 150,
+            };
 
             // create node system // TODO
             List<Planet> allPlanets = new List<Planet>();
@@ -57,11 +81,11 @@ namespace PlanetOverview
             center.PlanetStructures.Add(imperialBarracks);
             center.PlanetStructures.Add(imperialFactory);
             center.PlanetStructures.Add(imperialRefinery);
-            center.AddLandUnit(stormTrooper);
-            center.AddLandUnit(stormTrooper);
-            center.AddLandUnit(atSt);
+            center.AddNewLandUnit(stormTrooper);
+            center.AddNewLandUnit(stormTrooper);
+            center.AddNewLandUnit(atSt);
             center.PlanetSpaceStation = new SpaceStation() { Level = 3 };
-            center.AddSpaceUnit(starDestroyer);
+            center.AddNewUnitToSpaceArea(starDestroyer);
             allPlanets.Add(center);
             Planet northFirst = new Planet()
             {
@@ -83,10 +107,10 @@ namespace PlanetOverview
                 Income = 300,
             };
             northSecondLeft.PlanetStructures.Add(rebellionTrainingCamp);
-            northSecondLeft.AddLandUnit(rebelSoldier);
-            northSecondLeft.AddSpaceUnit(xWing);
-            northSecondLeft.AddSpaceUnit(xWing);
-            northSecondLeft.AddSpaceUnit(xWing);
+            northSecondLeft.AddNewLandUnit(rebelSoldier);
+            northSecondLeft.AddNewUnitToSpaceArea(xWing);
+            northSecondLeft.AddNewUnitToSpaceArea(xWing);
+            northSecondLeft.AddNewUnitToSpaceArea(xWing);
             northSecondLeft.PlanetSpaceStation = new SpaceStation() { Level = 1 };
             allPlanets.Add(northSecondLeft);
             Planet northSecondRight = new Planet()
@@ -109,8 +133,8 @@ namespace PlanetOverview
                 Income = 500,
             };
             southFirst.PlanetStructures.Add(rebellionFactory);
-            southFirst.AddLandUnit(rebelSoldier);
-            southFirst.AddSpaceUnit(xWing);
+            southFirst.AddNewLandUnit(rebelSoldier);
+            southFirst.AddNewUnitToSpaceArea(xWing);
             southFirst.PlanetSpaceStation = new SpaceStation() { Level = 2 };
             allPlanets.Add(southFirst);
 
@@ -127,9 +151,8 @@ namespace PlanetOverview
             northSecondLeft.AdjacentPlanets.Add(northFirst);
             southFirst.AdjacentPlanets.Add(center);
 
-
-
-            // print the connection
+            // print the setup
+            Console.WriteLine("----------------------------------------------------------------------------------");
             foreach (var p in allPlanets)
             {
                 string owner = p.Owner != null ? p.Owner.Name : "Neutral";
@@ -156,11 +179,12 @@ namespace PlanetOverview
 
                 // List current garison
                 Console.WriteLine("Planet garrison:");
-                foreach(var t in p.PlanetLandTiles)
+                var unitGarrison = p.GetGroundStack();
+                foreach (var u in unitGarrison.Units)
                 {
-                    if(t.Units.Count > 0)
+                    if(u != null) 
                     {
-                        Console.WriteLine(t.Units.First().Name);
+                        Console.WriteLine(u.Name);
                     }
                 }
                 Console.WriteLine();
@@ -174,16 +198,45 @@ namespace PlanetOverview
 
                 Console.WriteLine("Current fleet:");
                 // List current fleets
-                foreach(var t in p.PlanetSpaceTiles)
+                foreach(var stack in p.PlanetSpaceLocations)
                 {
-                    if(t.Units.Count >0)
+                    if(stack.Units.Count >0)
                     {
-                        string fleet = string.Join(",", t.Units.Select(u => u.Name));
+                        string fleet = string.Join(",", stack.Units.Select(u => u.Name));
                         Console.WriteLine(fleet);
                     }
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine("----------------------------------------------------------------------------------");
+
+            //Build test
+            center.AddUnitToLandBuildQueue(stormTrooper);
+            center.AddUnitToLandBuildQueue(atSt);
+            center.AddUnitToLandBuildQueue(stormTrooper);
+            center.AddUnitToLandBuildQueue(stormTrooper);
+
+            // print the queue
+            PrintUnitList(center.LandBuildQueue);
+
+            center.RemoveUnitFromLandBuildQueue(2);
+
+            Console.WriteLine();
+            PrintUnitList(center.LandBuildQueue);
+            center.RemoveUnitFromLandBuildQueue(2);
+            Console.WriteLine();
+            PrintUnitList(center.LandBuildQueue);
+        }
+        private static void PrintUnitList(List<Unit> unitList)
+        {
+            for(int i = 0; i< unitList.Count; i++)
+            {
+                Console.WriteLine(unitList[i].Name);
+            }
+        }
+
+        private static void RunCycle()
+        {
 
         }
     }

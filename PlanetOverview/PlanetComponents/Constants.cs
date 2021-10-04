@@ -10,5 +10,8 @@ namespace PlanetOverview.PlanetComponents
         public static readonly int PlanetTileSize = 10;
         // Each planet have a standard amount of space tiles
         public static readonly int SpaceTileSize = 3;
+
+        // Build queue length
+        public static readonly int BuildQueueLength = 5;
     }
 }

@@ -10,6 +10,14 @@ namespace PlanetOverview.UnitComponents
     /// </summary>
     public class Unit
     {
+        // Static data
         public string Name { get; set; }
+        public int Cost { get; set; }
+        public int BuildEffortCost { get; set; }
+
+
+        // variable data
+        public int QueuedPrice { get; set; }
+        public int BuildEffortPaid { get; set; }
     }
 }
