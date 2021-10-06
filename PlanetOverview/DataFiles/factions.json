@@ -1,0 +1,86 @@
+[
+  {
+    "Name": "Empire",
+    "Structures": [
+      {
+        "Name": "Imperial Barracks",
+        "Cost": 0,
+        "BuildEffortCost": 0,
+        "QueuedPrice": 0,
+        "BuildEffortRemaing": 0
+      },
+      {
+        "Name": "Imperial Refinery",
+        "Cost": 0,
+        "BuildEffortCost": 0,
+        "QueuedPrice": 0,
+        "BuildEffortRemaing": 0
+      },
+      {
+        "Name": "Imperial Factory",
+        "Cost": 0,
+        "BuildEffortCost": 0,
+        "QueuedPrice": 0,
+        "BuildEffortRemaing": 0
+      }
+    ],
+    "Units": [
+      {
+        "Name": "Storm Trooper",
+        "Cost": 50,
+        "BuildEffortCost": 50,
+        "QueuedPrice": 0,
+        "BuildEffortRemaing": 0
+      },
+      {
+        "Name": "AT-ST",
+        "Cost": 150,
+        "BuildEffortCost": 150,
+        "QueuedPrice": 0,
+        "BuildEffortRemaing": 0
+      },
+      {
+        "Name": "Star destroyer",
+        "Cost": 4000,
+        "BuildEffortCost": 1000,
+        "QueuedPrice": 0,
+        "BuildEffortRemaing": 0
+      }
+    ]
+  },
+  {
+    "Name": "Rebellion",
+    "Structures": [
+      {
+        "Name": "Rebellion Training Camp",
+        "Cost": 0,
+        "BuildEffortCost": 0,
+        "QueuedPrice": 0,
+        "BuildEffortRemaing": 0
+      },
+      {
+        "Name": "Rebellion Factory",
+        "Cost": 0,
+        "BuildEffortCost": 0,
+        "QueuedPrice": 0,
+        "BuildEffortRemaing": 0
+      }
+    ],
+    "Units": [
+      {
+        "Name": "Rebel Trooper",
+        "Cost": 40,
+        "BuildEffortCost": 45,
+        "QueuedPrice": 0,
+        "BuildEffortRemaing": 0
+      },
+      {
+        "Name": "X-Wing",
+        "Cost": 150,
+        "BuildEffortCost": 150,
+        "QueuedPrice": 0,
+        "BuildEffortRemaing": 0
+      }
+    ]
+  }
+]

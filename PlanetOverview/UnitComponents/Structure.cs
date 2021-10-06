@@ -10,5 +10,6 @@ namespace PlanetOverview.UnitComponents
     /// </summary>
     public class Structure : Unit
     {
+
     }
 }

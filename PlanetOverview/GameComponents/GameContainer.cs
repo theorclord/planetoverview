@@ -3,8 +3,10 @@ using PlanetOverview.PlayerComponents;
 using PlanetOverview.UnitComponents;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 
 namespace PlanetOverview.GameComponents
 {
@@ -22,9 +24,34 @@ namespace PlanetOverview.GameComponents
             Factions = new List<Faction>();
         }
 
-        public void LoadGameData()
+        /// <summary>
+        /// Used for debug and development
+        /// </summary>
+        public void SaveJsonRepresentationOfFactions()
         {
-            // Load all faction data from a text file
+            //Json
+            string json = JsonSerializer.Serialize<List<Faction>>(Factions);
+
+            string loadedJson = "";
+            string filePath = AppContext.BaseDirectory + @"DataFiles\factions.json"; // TODO make this configurable (for mods)
+            using(TextReader reader = new StreamReader(filePath))
+            {
+                loadedJson = reader.ReadToEnd();
+            }
+
+            List<Faction> testLoad = JsonSerializer.Deserialize<List<Faction>>(loadedJson);
+        }
+
+        public void LoadFactionsJson()
+        {
+            string loadedJson = "";
+            string filePath = AppContext.BaseDirectory + @"DataFiles\factions.json"; // TODO make this configurable (for mods)
+            using (TextReader reader = new StreamReader(filePath))
+            {
+                loadedJson = reader.ReadToEnd();
+            }
+
+            Factions = JsonSerializer.Deserialize<List<Faction>>(loadedJson);
         }
 
         public string GenerateStringRepresentation()

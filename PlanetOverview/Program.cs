@@ -18,71 +18,17 @@ namespace PlanetOverview
             // Container holding all gamme information
             GameContainer container = new GameContainer();
 
-            // TODO load all this from files
             // Create factions with their structures and units
-            Faction empire = new Faction()
-            {
-                Name = "Empire",
-                Structures = new List<Structure>()
-                {
-                    new Structure() { Name = "Imperial Barracks" },
-                    new Structure() { Name = "Imperial Refinery" },
-                    new Structure() { Name = "Imperial Factory" },
-                },
-                Units = new List<Unit>()
-                {
-                    new Unit()
-                    {
-                        Name = "Storm Trooper",
-                        BuildEffortCost = 50,
-                        Cost = 50,
-                    },
-                    new Unit() { 
-                        Name = "AT-ST",
-                        BuildEffortCost = 150,
-                        Cost = 150, 
-                    },
-                    new Unit() 
-                    { 
-                        Name = "Star destroyer",
-                        BuildEffortCost = 1000,
-                        Cost = 4000, 
-                    },
-                },
-            };
-            container.Factions.Add(empire);
+            container.LoadFactionsJson();
 
-            Faction rebellion = new Faction()
-            {
-                Name = "Rebellion",
-                Structures = new List<Structure>()
-                {
-                    new Structure() { Name = "Rebellion Training Camp" },
-                    new Structure() { Name = "Rebellion Factory" },
-                },
-                Units = new List<Unit>()
-                {
-                    new Unit() 
-                    {
-                        Name = "Rebel Trooper",
-                        BuildEffortCost = 45,
-                        Cost = 40,
-                    },
-                    new Unit() 
-                    {  
-                        Name = "X-Wing",
-                        BuildEffortCost = 150,
-                        Cost = 150,
-                    },
-                },
-            };
-            container.Factions.Add(rebellion);
 
+            // TODO load all this from files
+            container.SaveJsonRepresentationOfFactions();
 
             // Create sample players
-            Player p1 = new Player() { Name = "Player1", Faction = empire, Credits = 10000 };
+            Player p1 = new Player() { Name = "Player1", Faction = container.Factions[0], Credits = 10000 };
             container.Players.Add(p1);
-            Player p2 = new Player() { Name = "Player2", Faction = rebellion, Credits = 10000 };
+            Player p2 = new Player() { Name = "Player2", Faction = container.Factions[1], Credits = 10000 };
             container.Players.Add(p2);
             //players.Add(new Player() { Name = "Neutral" }); try with neutral as null on planets
             
@@ -176,10 +122,10 @@ namespace PlanetOverview
             Console.WriteLine("----------------------------------------------------------------------------------");
 
             //Build test
-            center.AddUnitToLandBuildQueue(center.Owner.Faction.Units[0]);
-            center.AddUnitToLandBuildQueue(center.Owner.Faction.Units[1]);
-            center.AddUnitToLandBuildQueue(center.Owner.Faction.Units[0]);
-            center.AddUnitToLandBuildQueue(center.Owner.Faction.Units[0]);
+            center.AddUnitToBuildQueue(center.Owner.Faction.Units[0], Planet.BuildQueueType.Land);
+            center.AddUnitToBuildQueue(center.Owner.Faction.Units[1], Planet.BuildQueueType.Land);
+            center.AddUnitToBuildQueue(center.Owner.Faction.Units[0], Planet.BuildQueueType.Land);
+            center.AddUnitToBuildQueue(center.Owner.Faction.Units[0], Planet.BuildQueueType.Land);
 
             // print the queue
             PrintUnitList(center.LandBuildQueue);
@@ -192,8 +138,8 @@ namespace PlanetOverview
             Console.WriteLine();
             PrintUnitList(center.LandBuildQueue);
 
-            center.AddUnitToLandBuildQueue(center.Owner.Faction.Units[0]);
-            center.AddUnitToLandBuildQueue(center.Owner.Faction.Units[0]);
+            center.AddUnitToBuildQueue(center.Owner.Faction.Units[0], Planet.BuildQueueType.Land);
+            center.AddUnitToBuildQueue(center.Owner.Faction.Units[0], Planet.BuildQueueType.Land);
 
             RunCycle(container);
         }

@@ -122,36 +122,20 @@ namespace PlanetOverview.PlanetComponents
 
         #region buildRegion
         /// <summary>
-        /// Adds a unit to the build queue. 
-        /// Will only be callable if there is less units in queue than queue length
-        /// </summary>
-        /// <param name="unit">The unit to build.</param>
-        public void AddUnitToLandBuildQueue(Unit unit)
-        {
-            //TODO ensure the unit have its price and build time adjusted correctly
-            unit.BuildEffortRemaing = unit.BuildEffortCost;
-            if(LandBuildQueue.Count < Constants.BuildQueueLength)
-            {
-                LandBuildQueue.Add(unit);
-            }
-        }
-
-        /// <summary>
         /// Adds a buildable to the build queue.
         /// Should not be callable if the unit queue is full.
         /// Should not be callable if you can't afford the buildable
         /// </summary>
-        /// <param name="buildable"></param>
+        /// <param name="unit"></param>
         /// <param name="queueType"></param>
         public void AddUnitToBuildQueue(Unit unit, BuildQueueType queueType)
         {
             //TODO figure out actual price for unit
             // this could be changed by price reduction an such
             unit.QueuedPrice = unit.Cost;
-
+            unit.BuildEffortRemaing = unit.BuildEffortCost;
 
             Owner.Credits -= unit.QueuedPrice;
-
 
             switch (queueType)
             {
@@ -172,7 +156,6 @@ namespace PlanetOverview.PlanetComponents
             }
         }
 
-
         public void RemoveUnitFromLandBuildQueue(int index)
         {
             var unitToRemove = LandBuildQueue[index];
@@ -190,24 +173,33 @@ namespace PlanetOverview.PlanetComponents
                 Owner.Credits += Income;
             }
             // progress queue
-            ProgressBuildQueue();
+            // TODO run through all build type
+            ProgressBuildQueue(BuildQueueType.Land);
+            ProgressBuildQueue(BuildQueueType.Space);
             // ??
         }
 
-        public void ProgressBuildQueue()
+        public void ProgressBuildQueue(BuildQueueType type)
         {
+            List<Unit> buildQueue = (type) switch
+            {
+                BuildQueueType.Land => LandBuildQueue,
+                BuildQueueType.Space => SpaceBuildQueue,
+                _ => new List<Unit>(),
+            };
+            
             // progres land build queue
-            if(LandBuildQueue.Count > 0)
+            if (buildQueue.Count > 0)
             {
                 int generatedEffortToSpend = 150; // TODO Planet build value based on structures
-                while(generatedEffortToSpend > 0 && LandBuildQueue.Count >0)
+                while(generatedEffortToSpend > 0 && buildQueue.Count >0)
                 {
-                    var currentProduction = LandBuildQueue[0];
+                    var currentProduction = buildQueue[0];
 
                     if (currentProduction.BuildEffortRemaing <= generatedEffortToSpend)
                     {
                         generatedEffortToSpend -= currentProduction.BuildEffortRemaing;
-                        LandBuildQueue.RemoveAt(0);
+                        buildQueue.RemoveAt(0);
                         AddNewLandUnit(currentProduction);
                         Console.WriteLine($"Debug: Unit produced at planet {Name}: {currentProduction.Name}");
                     } else
