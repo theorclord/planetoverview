@@ -1,4 +1,5 @@
-﻿using PlanetOverview.PlanetComponents;
+﻿using PlanetOverview.GameComponents;
+using PlanetOverview.PlanetComponents;
 using PlanetOverview.PlayerComponents;
 using PlanetOverview.UnitComponents;
 using System;
@@ -14,6 +15,8 @@ namespace PlanetOverview
         {
             Console.WriteLine("Creating simple planet system");
 
+            // Container holding all gamme information
+            GameContainer container = new GameContainer();
             // Create sample players
             List<Player> players = new List<Player>();
             Player empire = new Player() { Name = "Empire", Credits = 10000 };
@@ -22,51 +25,63 @@ namespace PlanetOverview
             players.Add(rebellion);
             //players.Add(new Player() { Name = "Neutral" }); try with neutral as null
 
-            // Create structures
-            Structure imperialBarracks = new Structure() { Name = "Imperial Barracks" };
-            Structure imperialRefinery = new Structure() { Name = "Imperial Refinery" };
-            Structure imperialFactory = new Structure() { Name = "Imperial Factory" };
-            Structure rebellionTrainingCamp = new Structure() { Name = "Rebellion Training Camp" };
-            Structure rebellionFactory = new Structure() { Name = "Rebellion Factory" };
-
-            // Create units
-            // TODO load this from an xml file.
-            Unit stormTrooper = new Unit()
-            { 
-                Name = "Storm Trooper",
-                BuildEffortCost = 50,
-                Cost = 50,
-            };
-            Unit atSt = new Unit()
-            { 
-                Name = "AT-ST",
+            // TODO load all this from files
+            // Create factions with their structures and units
+            Faction empire = new Faction()
+            {
+                Name = "Empire",
+                Structures = new List<Structure>()
+                {
+                    new Structure() { Name = "Imperial Barracks" },
+                    new Structure() { Name = "Imperial Refinery" },
+                    new Structure() { Name = "Imperial Factory" },
+                },
+                Units = new List<Unit>()
+                {
+                    new Unit() 
+                    { 
+                        Name = "Storm Trooper",
+                        BuildEffortCost = 50,
+                        Cost = 50,
+                    },
+                    new Unit() { Name = "AT-ST",
                 BuildEffortCost = 150,
-                Cost = 150,
-            };
-
-            Unit starDestroyer = new Unit()
-            { 
-                Name = "Star destroyer",
+                Cost = 150, },
+                    new Unit() { Name = "Star destroyer",
                 BuildEffortCost = 1000,
-                Cost = 4000,
+                Cost = 4000, },
+                },
             };
-            
-            Unit rebelSoldier = new Unit()
-            { 
+            container.Factions.Add(empire);
+
+            Faction rebellion = new Faction()
+            {
+                Name = "Rebellion",
+                Structures = new List<Structure>()
+                {
+                    new Structure() { Name = "Rebellion Training Camp" },
+                    new Structure() { Name = "Rebellion Factory" },
+                },
+                Units = new List<Unit>()
+                {
+                    new Unit() {
                 Name = "Rebel Trooper",
                 BuildEffortCost = 45,
-                Cost = 40,
-            };
-
-            Unit xWing = new Unit()
-            { 
-                Name = "X-Wing",
+                Cost = 40, },
+                    new Unit() {  Name = "X-Wing",
                 BuildEffortCost = 150,
-                Cost = 150,
+                Cost = 150, },
+                },
             };
+            container.Factions.Add(rebellion);
 
-            // create node system // TODO
-            List<Planet> allPlanets = new List<Planet>();
+
+            // Create sample players
+            Player p1 = new Player() { Name = "Player1", Faction = empire };
+            container.Players.Add(p1);
+            Player p2 = new Player() { Name = "Player2", Faction = rebellion };
+            container.Players.Add(p2);
+            //players.Add(new Player() { Name = "Neutral" }); try with neutral as null on planets
             
             // Create Planets
             Planet center = new Planet() 
@@ -75,18 +90,18 @@ namespace PlanetOverview
                 SupportedGroundStructureAmount = 5,
                 SupportedSpaceStationLevel = 4,
                 Coords = new Location() { X = 0, Y = 0},
-                Owner = empire,
+                Owner = container.Players[0],
                 Income = 800,
             };
-            center.PlanetStructures.Add(imperialBarracks);
-            center.PlanetStructures.Add(imperialFactory);
-            center.PlanetStructures.Add(imperialRefinery);
-            center.AddNewLandUnit(stormTrooper);
-            center.AddNewLandUnit(stormTrooper);
-            center.AddNewLandUnit(atSt);
+            center.PlanetStructures.Add(container.Players[0].Faction.Structures[0]);
+            center.PlanetStructures.Add(container.Players[0].Faction.Structures[2]);
+            center.PlanetStructures.Add(container.Players[0].Faction.Structures[1]);
+            center.AddLandUnit(container.Players[0].Faction.Units[0]);
+            center.AddLandUnit(container.Players[0].Faction.Units[0]);
+            center.AddLandUnit(container.Players[0].Faction.Units[1]);
             center.PlanetSpaceStation = new SpaceStation() { Level = 3 };
-            center.AddNewUnitToSpaceArea(starDestroyer);
-            allPlanets.Add(center);
+            center.AddSpaceUnit(container.Players[0].Faction.Units[2]);
+            container.AllPlanets.Add(center);
             Planet northFirst = new Planet()
             {
                 Name = "North First",
@@ -96,23 +111,23 @@ namespace PlanetOverview
                 Owner = null,
                 Income = 250,
             };
-            allPlanets.Add(northFirst);
+            container.AllPlanets.Add(northFirst);
             Planet northSecondLeft = new Planet()
             {
                 Name = "North Second Left",
                 SupportedGroundStructureAmount = 4,
                 SupportedSpaceStationLevel = 1,
                 Coords = new Location() { X = -1, Y = 2 },
-                Owner = rebellion,
+                Owner = container.Players[1],
                 Income = 300,
             };
-            northSecondLeft.PlanetStructures.Add(rebellionTrainingCamp);
-            northSecondLeft.AddNewLandUnit(rebelSoldier);
-            northSecondLeft.AddNewUnitToSpaceArea(xWing);
-            northSecondLeft.AddNewUnitToSpaceArea(xWing);
-            northSecondLeft.AddNewUnitToSpaceArea(xWing);
+            northSecondLeft.PlanetStructures.Add(container.Players[1].Faction.Structures[0]);
+            northSecondLeft.AddLandUnit(container.Players[1].Faction.Units[0]);
+            northSecondLeft.AddSpaceUnit(container.Players[1].Faction.Units[1]);
+            northSecondLeft.AddSpaceUnit(container.Players[1].Faction.Units[1]);
+            northSecondLeft.AddSpaceUnit(container.Players[1].Faction.Units[1]);
             northSecondLeft.PlanetSpaceStation = new SpaceStation() { Level = 1 };
-            allPlanets.Add(northSecondLeft);
+            container.AllPlanets.Add(northSecondLeft);
             Planet northSecondRight = new Planet()
             {
                 Name = "North Second Right",
@@ -122,21 +137,21 @@ namespace PlanetOverview
                 Owner = null,
                 Income = 400,
             };
-            allPlanets.Add(northSecondRight);
+            container.AllPlanets.Add(northSecondRight);
             Planet southFirst = new Planet()
             {
                 Name = "South First",
                 SupportedGroundStructureAmount = 6,
                 SupportedSpaceStationLevel = 2,
                 Coords = new Location() { X = 0, Y = -1 },
-                Owner = rebellion,
+                Owner = container.Players[1],
                 Income = 500,
             };
-            southFirst.PlanetStructures.Add(rebellionFactory);
-            southFirst.AddNewLandUnit(rebelSoldier);
-            southFirst.AddNewUnitToSpaceArea(xWing);
+            southFirst.PlanetStructures.Add(container.Players[1].Faction.Structures[1]);
+            southFirst.AddLandUnit(container.Players[1].Faction.Units[0]);
+            southFirst.AddSpaceUnit(container.Players[1].Faction.Units[1]);
             southFirst.PlanetSpaceStation = new SpaceStation() { Level = 2 };
-            allPlanets.Add(southFirst);
+            container.AllPlanets.Add(southFirst);
 
             // Add connections 
             // Todo move to a collection of connections. Adding the weight of the rute

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PlanetOverview.UnitComponents;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,5 +9,7 @@ namespace PlanetOverview.PlayerComponents
     {
         public string Name { get; set; }
         public int Credits { get; set; }
+
+        public Faction Faction { get; set; }
     }
 }
