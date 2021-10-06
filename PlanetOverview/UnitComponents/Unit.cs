@@ -18,6 +18,6 @@ namespace PlanetOverview.UnitComponents
 
         // variable data
         public int QueuedPrice { get; set; }
-        public int BuildEffortPaid { get; set; }
+        public int BuildEffortRemaing { get; set; }
     }
 }

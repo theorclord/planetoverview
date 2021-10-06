@@ -125,10 +125,11 @@ namespace PlanetOverview.PlanetComponents
         /// Adds a unit to the build queue. 
         /// Will only be callable if there is less units in queue than queue length
         /// </summary>
-        /// <param name="unit"></param>
+        /// <param name="unit">The unit to build.</param>
         public void AddUnitToLandBuildQueue(Unit unit)
         {
-
+            //TODO ensure the unit have its price and build time adjusted correctly
+            unit.BuildEffortRemaing = unit.BuildEffortCost;
             if(LandBuildQueue.Count < Constants.BuildQueueLength)
             {
                 LandBuildQueue.Add(unit);
@@ -189,13 +190,33 @@ namespace PlanetOverview.PlanetComponents
                 Owner.Credits += Income;
             }
             // progress queue
-
+            ProgressBuildQueue();
             // ??
         }
 
         public void ProgressBuildQueue()
         {
+            // progres land build queue
+            if(LandBuildQueue.Count > 0)
+            {
+                int generatedEffortToSpend = 150; // TODO Planet build value based on structures
+                while(generatedEffortToSpend > 0 && LandBuildQueue.Count >0)
+                {
+                    var currentProduction = LandBuildQueue[0];
 
+                    if (currentProduction.BuildEffortRemaing <= generatedEffortToSpend)
+                    {
+                        generatedEffortToSpend -= currentProduction.BuildEffortRemaing;
+                        LandBuildQueue.RemoveAt(0);
+                        AddNewLandUnit(currentProduction);
+                        Console.WriteLine($"Debug: Unit produced at planet {Name}: {currentProduction.Name}");
+                    } else
+                    {
+                        currentProduction.BuildEffortRemaing -= generatedEffortToSpend;
+                        generatedEffortToSpend = 0;
+                    }
+                }
+            }
         }
     }
 }

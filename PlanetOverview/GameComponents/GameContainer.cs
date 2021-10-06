@@ -55,11 +55,12 @@ namespace PlanetOverview.GameComponents
 
                 // List current garison
                 builder.AppendLine("Planet garrison:");
-                foreach (var t in p.PlanetLandTiles)
+                var unitGarrison = p.GetGroundStack();
+                foreach (var u in unitGarrison.Units)
                 {
-                    if (t.Units.Count > 0)
+                    if (u != null)
                     {
-                        builder.AppendLine(t.Units.First().Name);
+                        builder.AppendLine(u.Name);
                     }
                 }
                 builder.AppendLine();
@@ -73,11 +74,11 @@ namespace PlanetOverview.GameComponents
 
                 builder.AppendLine("Current fleet:");
                 // List current fleets
-                foreach (var t in p.PlanetSpaceTiles)
+                foreach (var stack in p.PlanetSpaceLocations)
                 {
-                    if (t.Units.Count > 0)
+                    if (stack.Units.Count > 0)
                     {
-                        string fleet = string.Join(",", t.Units.Select(u => u.Name));
+                        string fleet = string.Join(",", stack.Units.Select(u => u.Name));
                         builder.AppendLine(fleet);
                     }
                 }
