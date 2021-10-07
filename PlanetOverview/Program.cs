@@ -21,30 +21,27 @@ namespace PlanetOverview
             // Create factions with their structures and units
             container.LoadFactionsJson();
 
-
-            // TODO load all this from files
-            container.SaveJsonRepresentationOfFactions();
-
             // Create sample players
-            Player p1 = new Player() { Name = "Player1", Faction = container.Factions[0], Credits = 10000 };
+            Player p1 = new Player() { Name = "Player1", Faction = container.Factions[0], Credits = 500 };
             container.Players.Add(p1);
             Player p2 = new Player() { Name = "Player2", Faction = container.Factions[1], Credits = 10000 };
             container.Players.Add(p2);
             //players.Add(new Player() { Name = "Neutral" }); try with neutral as null on planets
-            
+
             // Create Planets
-            Planet center = new Planet() 
-            { 
+            Planet center = new Planet()
+            {
                 Name = "Center",
                 SupportedGroundStructureAmount = 5,
                 SupportedSpaceStationLevel = 4,
-                Coords = new Location() { X = 0, Y = 0},
+                Coords = new Location() { X = 0, Y = 0 },
                 Owner = container.Players[0],
                 Income = 800,
+                BaseBuildEffort = 500,
             };
-            center.PlanetStructures.Add(container.Players[0].Faction.Structures[0]);
-            center.PlanetStructures.Add(container.Players[0].Faction.Structures[2]);
-            center.PlanetStructures.Add(container.Players[0].Faction.Structures[1]);
+            center.AddNewStructure(new Structure(container.Players[0].Faction.Structures[0]));
+            center.AddNewStructure(new Structure(container.Players[0].Faction.Structures[2]));
+            center.AddNewStructure(new Structure(container.Players[0].Faction.Structures[1]));
             center.AddNewLandUnit(container.Players[0].Faction.Units[0]);
             center.AddNewLandUnit(container.Players[0].Faction.Units[0]);
             center.AddNewLandUnit(container.Players[0].Faction.Units[1]);
@@ -57,8 +54,9 @@ namespace PlanetOverview
                 SupportedGroundStructureAmount = 3,
                 SupportedSpaceStationLevel = 2,
                 Coords = new Location() { X = 0, Y = 1 },
-                Owner = null,
+                Owner = container.Players[0],
                 Income = 250,
+                BaseBuildEffort = 500,
             };
             container.AllPlanets.Add(northFirst);
             Planet northSecondLeft = new Planet()
@@ -69,8 +67,9 @@ namespace PlanetOverview
                 Coords = new Location() { X = -1, Y = 2 },
                 Owner = container.Players[1],
                 Income = 300,
+                BaseBuildEffort = 500,
             };
-            northSecondLeft.PlanetStructures.Add(container.Players[1].Faction.Structures[0]);
+            northSecondLeft.AddNewStructure(new Structure(container.Players[1].Faction.Structures[0]));
             northSecondLeft.AddNewLandUnit(container.Players[1].Faction.Units[0]);
             northSecondLeft.AddNewUnitToSpaceArea(container.Players[1].Faction.Units[1]);
             northSecondLeft.AddNewUnitToSpaceArea(container.Players[1].Faction.Units[1]);
@@ -85,6 +84,7 @@ namespace PlanetOverview
                 Coords = new Location() { X = 1, Y = 2 },
                 Owner = null,
                 Income = 400,
+                BaseBuildEffort = 500,
             };
             container.AllPlanets.Add(northSecondRight);
             Planet southFirst = new Planet()
@@ -95,8 +95,9 @@ namespace PlanetOverview
                 Coords = new Location() { X = 0, Y = -1 },
                 Owner = container.Players[1],
                 Income = 500,
+                BaseBuildEffort = 500,
             };
-            southFirst.PlanetStructures.Add(container.Players[1].Faction.Structures[1]);
+            southFirst.AddNewStructure(new Structure(container.Players[1].Faction.Structures[1]));
             southFirst.AddNewLandUnit(container.Players[1].Faction.Units[0]);
             southFirst.AddNewUnitToSpaceArea(container.Players[1].Faction.Units[1]);
             southFirst.PlanetSpaceStation = new SpaceStation() { Level = 2 };
@@ -128,20 +129,89 @@ namespace PlanetOverview
             center.AddUnitToBuildQueue(center.Owner.Faction.Units[0], Planet.BuildQueueType.Land);
 
             // print the queue
-            PrintUnitList(center.LandBuildQueue);
+            PrintUnitList(center.BuildQueues[Planet.BuildQueueType.Land]);
 
-            center.RemoveUnitFromLandBuildQueue(2);
+            center.RemoveUnitFromBuildQueue(2, Planet.BuildQueueType.Land);
 
             Console.WriteLine();
-            PrintUnitList(center.LandBuildQueue);
-            center.RemoveUnitFromLandBuildQueue(2);
+            PrintUnitList(center.BuildQueues[Planet.BuildQueueType.Land]);
+            center.RemoveUnitFromBuildQueue(2, Planet.BuildQueueType.Land);
             Console.WriteLine();
-            PrintUnitList(center.LandBuildQueue);
+            PrintUnitList(center.BuildQueues[Planet.BuildQueueType.Land]);
 
             center.AddUnitToBuildQueue(center.Owner.Faction.Units[0], Planet.BuildQueueType.Land);
             center.AddUnitToBuildQueue(center.Owner.Faction.Units[0], Planet.BuildQueueType.Land);
+
+            center.AddUnitToBuildQueue(center.Owner.Faction.Structures[0], Planet.BuildQueueType.Structures);
 
             RunCycle(container);
+
+            // Test area
+
+            // Game loop
+            // Get buildable from a planet
+            // Build a building you can afford
+            // Cycle till it is built
+            while (true)
+            {
+                string line = Console.ReadLine();
+                if(line == "q")
+                {
+                    break;
+                }
+
+                if(line == "l")
+                {
+                    Console.WriteLine(container.Factions[0].Structures[0].Name);
+                    Console.WriteLine(container.Factions[0].Structures[0].BuildEffortCost);
+                    Console.WriteLine(container.Factions[0].Structures[0].BuildEffortProvided);
+                    Console.WriteLine(container.Factions[0].Structures[0].Cost);
+                }
+
+                if (line.StartsWith("p"))
+                {
+                    string[] lineParts = line.Split(' ');
+                    bool intFound = int.TryParse(lineParts[1], out int pIndex);
+                    if (intFound)
+                    {
+                        Planet temp = container.AllPlanets[pIndex];
+                        Console.WriteLine(temp.GetStringRep());
+
+                        Console.WriteLine($"Planet {temp.Name} buildable: ");
+                        PrintUnitList(temp.GetBuildableUnits());
+                        PrintUnitList(temp.GetBuildableStructures().Select(x => new Unit() { Name = x.Item2.Name }).ToList());
+                    }
+                }
+
+                
+
+                if(line == "run")
+                {
+                    RunCycle(container);
+                }
+
+                if(line == "save")
+                {
+                    container.SaveJsonRepresentationOfFactions();
+                }
+
+                if (line == "test")
+                {
+                    Planet temp = container.AllPlanets[0];
+                    Console.WriteLine(temp.GetStringRep());
+
+                    Console.WriteLine($"Owner Credits: {temp.Owner.Credits}");
+
+                    var strucsToBuild = temp.GetBuildableStructures();
+                    Console.WriteLine($"Structures to build: ");
+                    Console.WriteLine(string.Join(", ",strucsToBuild.Select(x => $"Can build: {x.Item1}, {x.Item2.Name}")));
+                    Structure buildThis = strucsToBuild.First(x => x.Item1).Item2;
+                    Console.WriteLine($"Structure build selected: {buildThis.Name}");
+                    temp.AddUnitToBuildQueue(buildThis, Planet.BuildQueueType.Structures);
+                    Console.WriteLine($"Owner Credits: {temp.Owner.Credits}");
+                }
+            }
+            
         }
         private static void PrintUnitList(List<Unit> unitList)
         {

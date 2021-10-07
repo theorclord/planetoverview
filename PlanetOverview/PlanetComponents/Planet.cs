@@ -14,7 +14,7 @@ namespace PlanetOverview.PlanetComponents
     {
         public enum BuildQueueType
         {
-            Land = 1, Space = 2, 
+            Land = 1, Space = 2, Structures = 3,
         }
         // Ideas to consider
         // it needs space station level 
@@ -27,6 +27,7 @@ namespace PlanetOverview.PlanetComponents
 
         // Identifiers
         public string Name { get; set; }
+        
         public Location Coords { get; set; }
         public Player Owner { get; set; }
 
@@ -47,9 +48,9 @@ namespace PlanetOverview.PlanetComponents
         public List<Tile> PlanetLandTiles { get; private set; }
 
         public int Income { get; set; }
+        public int BaseBuildEffort { get; set; }
 
-        public List<Unit> SpaceBuildQueue { get; private set; }
-        public List<Unit> LandBuildQueue { get; private set; }
+        public Dictionary<BuildQueueType,List<Unit>> BuildQueues { get; private set; }
 
         public Planet()
         {
@@ -71,8 +72,12 @@ namespace PlanetOverview.PlanetComponents
 
             AdjacentPlanets = new List<Planet>();
             PlanetStructures = new List<Structure>();
-            LandBuildQueue = new List<Unit>(Constants.BuildQueueLength);
-            SpaceBuildQueue = new List<Unit>(Constants.BuildQueueLength);
+
+            BuildQueues = new Dictionary<BuildQueueType, List<Unit>>();
+            foreach (BuildQueueType type in Enum.GetValues(typeof(BuildQueueType)).Cast<BuildQueueType>())
+            {
+                BuildQueues.Add(type, new List<Unit>());
+            }
         }
 
         #region LocationFunctions
@@ -84,7 +89,7 @@ namespace PlanetOverview.PlanetComponents
         public void AddNewLandUnit(Unit unit)
         {
             // find first land tile that is empty. Add the unit to the tile.
-            var emptyTile = PlanetLandTiles.FirstOrDefault(t => t.Unit != null);
+            var emptyTile = PlanetLandTiles.FirstOrDefault(t => t.Unit == null);
             if(emptyTile == null)
             {
                 // try to add it to the space area
@@ -114,9 +119,21 @@ namespace PlanetOverview.PlanetComponents
             var unitStack = new Stack();
             foreach(var tile in PlanetLandTiles)
             {
-                unitStack.Units.Add(tile.Unit);
+                if(tile.Unit != null)
+                {
+                    unitStack.Units.Add(tile.Unit);
+                }
             }
             return unitStack;
+        }
+
+        /// <summary>
+        /// Adds a new structure to the planet. Does not take planet structure location into consideration
+        /// </summary>
+        /// <param name="struc"></param>
+        public void AddNewStructure(Structure struc)
+        {
+            PlanetStructures.Add(struc);
         }
         #endregion
 
@@ -137,30 +154,152 @@ namespace PlanetOverview.PlanetComponents
 
             Owner.Credits -= unit.QueuedPrice;
 
-            switch (queueType)
+            if(BuildQueues[queueType].Count < Constants.BuildQueueLength)
             {
-                case BuildQueueType.Land:
-                    if (LandBuildQueue.Count < Constants.BuildQueueLength)
-                    {
-                        LandBuildQueue.Add(unit);
-                    }
-                    break;
-                case BuildQueueType.Space:
-                    if (SpaceBuildQueue.Count < Constants.BuildQueueLength)
-                    {
-                        SpaceBuildQueue.Add(unit);
-                    }
-                    break;
-                default:
-                    break;
+                BuildQueues[queueType].Add(unit);
             }
         }
 
-        public void RemoveUnitFromLandBuildQueue(int index)
+        /// <summary>
+        /// Method for removing a unit from a queue.
+        /// This also refunds the price of the unit back to the owner.
+        /// </summary>
+        /// <param name="index">The index of the unit in the queue</param>
+        /// <param name="queueType">The queue of the unit</param>
+        public void RemoveUnitFromBuildQueue(int index, BuildQueueType queueType)
         {
-            var unitToRemove = LandBuildQueue[index];
-            LandBuildQueue.RemoveAt(index);
+            Unit unitToRemove = BuildQueues[queueType][index];
+            BuildQueues[queueType].RemoveAt(index);
             Owner.Credits += unitToRemove.QueuedPrice;
+        }
+
+        public void ProgressBuildQueue(List<Unit> buildQueue, BuildQueueType type)
+        {
+            //TODO figure out how to spread the building out for each of the queues
+            if (buildQueue.Count > 0)
+            {
+                
+                int generatedEffortToSpend = BaseBuildEffort; // TODO Planet build value based on structures
+                foreach (var struc in PlanetStructures)
+                {
+                    if(struc.QueueEffortType == type)
+                    {
+                        generatedEffortToSpend += struc.BuildEffortProvided;
+                    }
+                }
+
+                while (generatedEffortToSpend > 0 && buildQueue.Count > 0)
+                {
+                    var currentProduction = buildQueue[0];
+
+                    if (currentProduction.BuildEffortRemaing <= generatedEffortToSpend)
+                    {
+                        generatedEffortToSpend -= currentProduction.BuildEffortRemaing;
+                        buildQueue.RemoveAt(0);
+                        switch (type)
+                        {
+                            case BuildQueueType.Land:
+                                AddNewLandUnit(currentProduction);
+                                break;
+                            case BuildQueueType.Space:
+                                AddNewUnitToSpaceArea(currentProduction);
+                                break;
+                            case BuildQueueType.Structures:
+                                AddNewStructure(currentProduction as Structure);
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
+
+                        
+                        Console.WriteLine($"Debug: Unit produced at planet {Name}: {currentProduction.Name}");
+                    }
+                    else
+                    {
+                        currentProduction.BuildEffortRemaing -= generatedEffortToSpend;
+                        generatedEffortToSpend = 0;
+                    }
+                }
+            }
+        }
+
+        public List<Unit> GetBuildableUnits()
+        {
+            List<string> availableRequirements = GetAvailableRequirements();
+
+            List<Unit> buildAbleUnits = new List<Unit>();
+            foreach(Unit unit in Owner.Faction.Units)
+            {
+                bool buildAble = false;
+                foreach(string id in unit.Requirements)
+                {
+                    buildAble = availableRequirements.Contains(id);
+                }
+                if(unit.Requirements == null || buildAble)
+                {
+                    buildAbleUnits.Add(unit);
+                }
+            }
+
+            return buildAbleUnits;
+        }
+
+        public List<(bool, Structure)> GetBuildableStructures()
+        {
+            int ownerCredits = Owner.Credits;
+            List<(bool, Structure)> buildableStrucs = new List<(bool, Structure)>();
+            // if there is no space left, no structures can be built
+            if (SupportedGroundStructureAmount == PlanetStructures.Count)
+            {
+                return buildableStrucs;
+            }
+            // Gather the requirements based on all requirement giving entities
+            List<string> availableRequirements = GetAvailableRequirements();
+
+            
+            foreach (Structure struc in Owner.Faction.Structures)
+            {
+                bool buildAble = struc.Requirements == null;
+                if (!buildAble)
+                {
+                    foreach (string id in struc.Requirements)
+                    {
+                        buildAble = availableRequirements.Contains(id);
+                    }
+                }
+                if (buildAble)
+                {
+                    buildableStrucs.Add((ownerCredits >= struc.Cost, struc));
+                }
+            }
+
+            return buildableStrucs;
+        }
+
+        private List<string> GetAvailableRequirements()
+        {
+            // Gather the requirements based on all requirement giving entities
+            List<string> availableRequirements = new List<string>();
+            foreach (Structure unit in PlanetStructures)
+            {
+                availableRequirements.Add(unit.TextID);
+            }
+
+            foreach(Unit unit in GetGroundStack().Units)
+            {
+                availableRequirements.Add(unit.TextID);
+            }
+
+            //TODO check the stack is the same as the owner
+            foreach(Stack s in PlanetSpaceLocations)
+            {
+                foreach (Unit unit in s.Units)
+                {
+                    availableRequirements.Add(unit.TextID);
+                }
+            }
+            
+            return availableRequirements;
         }
         #endregion
 
@@ -174,41 +313,72 @@ namespace PlanetOverview.PlanetComponents
             }
             // progress queue
             // TODO run through all build type
-            ProgressBuildQueue(BuildQueueType.Land);
-            ProgressBuildQueue(BuildQueueType.Space);
-            // ??
+            foreach(KeyValuePair<BuildQueueType,List<Unit>> buildQueue in BuildQueues)
+            {
+                ProgressBuildQueue(buildQueue.Value,buildQueue.Key);
+            }
+            // TODO ??
         }
 
-        public void ProgressBuildQueue(BuildQueueType type)
+        #region DebugAndTest
+        public string GetStringRep()
         {
-            List<Unit> buildQueue = (type) switch
-            {
-                BuildQueueType.Land => LandBuildQueue,
-                BuildQueueType.Space => SpaceBuildQueue,
-                _ => new List<Unit>(),
-            };
-            
-            // progres land build queue
-            if (buildQueue.Count > 0)
-            {
-                int generatedEffortToSpend = 150; // TODO Planet build value based on structures
-                while(generatedEffortToSpend > 0 && buildQueue.Count >0)
-                {
-                    var currentProduction = buildQueue[0];
+            StringBuilder builder = new StringBuilder();
+            string owner = Owner != null ? Owner.Name : "Neutral";
+            string ownerFaction = Owner != null ? Owner.Faction.Name : "Neutral Faction";
+            builder.AppendLine($"Planet named, {Name}, owned by, {owner} of faction {ownerFaction}.");
+            builder.AppendLine($"The planets income is {Income}.");
+            builder.AppendLine($"It supports level {SupportedSpaceStationLevel} space station, and {SupportedGroundStructureAmount} ground structures.");
+            builder.AppendLine($"Located at ({Coords.X},{Coords.Y}) has the following neighbors:");
 
-                    if (currentProduction.BuildEffortRemaing <= generatedEffortToSpend)
-                    {
-                        generatedEffortToSpend -= currentProduction.BuildEffortRemaing;
-                        buildQueue.RemoveAt(0);
-                        AddNewLandUnit(currentProduction);
-                        Console.WriteLine($"Debug: Unit produced at planet {Name}: {currentProduction.Name}");
-                    } else
-                    {
-                        currentProduction.BuildEffortRemaing -= generatedEffortToSpend;
-                        generatedEffortToSpend = 0;
-                    }
+            // list all adjacent planets
+            foreach (var ajp in AdjacentPlanets)
+            {
+                builder.AppendLine($"Neighbor planet, {ajp.Name}");
+            }
+            builder.AppendLine();
+
+            // List current strutures
+            builder.AppendLine("Planet structures: ");
+            foreach (var s in PlanetStructures)
+            {
+                builder.AppendLine($"{s.Name}");
+            }
+            builder.AppendLine();
+
+            // List current garison
+            builder.AppendLine("Planet garrison:");
+            var unitGarrison = GetGroundStack();
+            foreach (var u in unitGarrison.Units)
+            {
+                if (u != null)
+                {
+                    builder.AppendLine(u.Name);
                 }
             }
+            builder.AppendLine();
+
+            // List current space station level / space structures
+            if (PlanetSpaceStation != null)
+            {
+                builder.AppendLine($"Space station level: {PlanetSpaceStation.Level}");
+            }
+            builder.AppendLine();
+
+            builder.AppendLine("Current fleet:");
+            // List current fleets
+            foreach (var stack in PlanetSpaceLocations)
+            {
+                if (stack.Units.Count > 0)
+                {
+                    string fleet = string.Join(",", stack.Units.Select(u => u.Name));
+                    builder.AppendLine(fleet);
+                }
+            }
+            builder.AppendLine();
+
+            return builder.ToString();
         }
+        #endregion
     }
 }
