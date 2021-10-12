@@ -160,14 +160,7 @@ namespace PlanetOverview
                     break;
                 }
 
-                if(line == "l")
-                {
-                    Console.WriteLine(container.Factions[0].Structures[0].Name);
-                    Console.WriteLine(container.Factions[0].Structures[0].BuildEffortCost);
-                    Console.WriteLine(container.Factions[0].Structures[0].BuildEffortProvided);
-                    Console.WriteLine(container.Factions[0].Structures[0].Cost);
-                }
-
+                // print a planet's information
                 if (line.StartsWith("p"))
                 {
                     string[] lineParts = line.Split(' ');
@@ -183,13 +176,30 @@ namespace PlanetOverview
                     }
                 }
 
-                
+                // get the build queue and queue a unit
+                if (line.StartsWith("pb"))
+                {
+                    string[] lineParts = line.Split(' ');
+                    bool intFound = int.TryParse(lineParts[1], out int pIndex);
+                    if (intFound)
+                    {
+                        Planet temp = container.AllPlanets[pIndex];
 
-                if(line == "run")
+                        List<Unit> unitsBuild = temp.GetBuildableUnits();
+                        PrintUnitList(temp.GetBuildableUnits());
+                        List<(bool,Structure)> strucBuild = temp.GetBuildableStructures();
+                        PrintUnitList(strucBuild.Select(x => new Unit() { Name = x.Item2.Name }).ToList());
+                    }
+                }
+
+
+                // run a cycle
+                if (line == "run")
                 {
                     RunCycle(container);
                 }
 
+                // Debug and test checks
                 if(line == "save")
                 {
                     container.SaveJsonRepresentationOfFactions();
@@ -209,6 +219,14 @@ namespace PlanetOverview
                     Console.WriteLine($"Structure build selected: {buildThis.Name}");
                     temp.AddUnitToBuildQueue(buildThis, Planet.BuildQueueType.Structures);
                     Console.WriteLine($"Owner Credits: {temp.Owner.Credits}");
+                }
+
+                if (line == "l")
+                {
+                    Console.WriteLine(container.Factions[0].Structures[0].Name);
+                    Console.WriteLine(container.Factions[0].Structures[0].BuildEffortCost);
+                    Console.WriteLine(container.Factions[0].Structures[0].BuildEffortProvided);
+                    Console.WriteLine(container.Factions[0].Structures[0].Cost);
                 }
             }
             
