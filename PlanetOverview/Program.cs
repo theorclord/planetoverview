@@ -177,21 +177,21 @@ namespace PlanetOverview
                 }
 
                 // get the build queue and queue a unit
-                if (line.StartsWith("pb"))
+                if (line.StartsWith("bp"))
                 {
                     string[] lineParts = line.Split(' ');
                     bool intFound = int.TryParse(lineParts[1], out int pIndex);
                     if (intFound)
                     {
-                        Planet temp = container.AllPlanets[pIndex];
-
-                        List<Unit> unitsBuild = temp.GetBuildableUnits();
-                        PrintUnitList(temp.GetBuildableUnits());
-                        List<(bool,Structure)> strucBuild = temp.GetBuildableStructures();
-                        PrintUnitList(strucBuild.Select(x => new Unit() { Name = x.Item2.Name }).ToList());
+                        AddToBuildQueue(pIndex, container);
                     }
                 }
 
+                // print player data
+                if(line == "me")
+                {
+                    Console.WriteLine(container.Players[0].GetStringRepresentation());
+                }
 
                 // run a cycle
                 if (line == "run")
@@ -231,6 +231,41 @@ namespace PlanetOverview
             }
             
         }
+
+        private static void AddToBuildQueue(int pIndex, GameContainer container)
+        {
+            Planet temp = container.AllPlanets[pIndex];
+
+            List<Unit> unitsBuild = temp.GetBuildableUnits();
+            PrintUnitList(temp.GetBuildableUnits());
+            List<(bool, Structure)> strucBuild = temp.GetBuildableStructures();
+            PrintUnitList(strucBuild.Select(x => new Unit() { Name = x.Item2.Name }).ToList());
+
+            Console.WriteLine("Select what to build: s X for structures, u X for units");
+            var orderString = Console.ReadLine();
+            var orderParts = orderString.Split(' ');
+
+            var parsed = int.TryParse(orderParts[1], out var index);
+
+            switch (orderParts[0])
+            {
+                case "s":
+                    // handle structure
+                    if (strucBuild[index].Item1)
+                    {
+                        temp.AddUnitToBuildQueue(strucBuild[index].Item2, Planet.BuildQueueType.Structures);
+                    }
+                    break;
+                case "u":
+                    // handle unit
+                    temp.AddUnitToBuildQueue(unitsBuild[index], Planet.BuildQueueType.Land);
+                    break;
+                default:
+                    Console.WriteLine("Not recongized build queue");
+                    break;
+            }
+        }
+
         private static void PrintUnitList(List<Unit> unitList)
         {
             for(int i = 0; i< unitList.Count; i++)

@@ -9,7 +9,6 @@ namespace PlanetOverview.PlanetComponents
     /// Class for the ground tiles on the planet.
     /// Contains one unit
     /// </summary>
-    /// TODO link to planet location. Add additional features if needed
     public class Tile
     {
         public Unit Unit { get; set; }

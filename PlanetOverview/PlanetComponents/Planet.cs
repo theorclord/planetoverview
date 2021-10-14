@@ -312,7 +312,6 @@ namespace PlanetOverview.PlanetComponents
                 Owner.Credits += Income;
             }
             // progress queue
-            // TODO run through all build type
             foreach(KeyValuePair<BuildQueueType,List<Unit>> buildQueue in BuildQueues)
             {
                 ProgressBuildQueue(buildQueue.Value,buildQueue.Key);

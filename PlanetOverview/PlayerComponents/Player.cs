@@ -11,5 +11,16 @@ namespace PlanetOverview.PlayerComponents
         public int Credits { get; set; }
 
         public Faction Faction { get; set; }
+
+        public string GetStringRepresentation()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append($"Player: {Name}");
+            sb.Append($"Credits: {Credits}");
+            sb.Append($"Faction: {Faction.Name}");
+
+            return sb.ToString();
+        }
     }
 }

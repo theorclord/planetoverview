@@ -1,0 +1,20 @@
+New functionality:
+Move stack from one planet to another
+Run a build and order loop from terminal
+Implement simple auto resolve
+
+TODOs:
+Building new units. How to handle space area being occupied by enemy fleet
+Quering units, adding modifiers to the price to figure out how much they cost
+Spread the buildeffort provided by each build over different queues
+
+Add owner to stacks. Check before getting build possibilities that the owner is the same
+Add a system for credit income on the planet
+
+Remember to update planet progress
+
+Add graph for moving between planets
+
+Structures added build effort should have a queue type
+
+Split unit into space and land
