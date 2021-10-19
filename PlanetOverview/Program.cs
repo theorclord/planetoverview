@@ -1,4 +1,5 @@
-﻿using PlanetOverview.GameComponents;
+﻿using PlanetOverview.Data;
+using PlanetOverview.GameComponents;
 using PlanetOverview.PlanetComponents;
 using PlanetOverview.PlayerComponents;
 using PlanetOverview.UnitComponents;
@@ -11,7 +12,6 @@ namespace PlanetOverview
 {
     class Program
     {
-        private static string empireStringID = "Empire_Faction";
         static void Main(string[] args)
         {
             Console.WriteLine("Creating simple planet system");
@@ -23,7 +23,7 @@ namespace PlanetOverview
             container.LoadFactionsJson();
 
             // Create sample players
-            Player p1 = new Player() { Name = "Player1", Faction = container.IDFactions[empireStringID], Credits = 500 };
+            Player p1 = new Player() { Name = "Player1", Faction = container.IDFactions[AllConstants.EmpireStringID], Credits = 500 };
             container.Players.Add(p1);
             Player p2 = new Player() { Name = "Player2", Faction = container.IDFactions["Rebellion_Faction"], Credits = 10000 };
             container.Players.Add(p2);
@@ -179,7 +179,7 @@ namespace PlanetOverview
 
                 if (line == "l")
                 {
-                    Console.WriteLine(container.IDFactions[empireStringID].GetStringRepresentation());
+                    Console.WriteLine(container.IDFactions[AllConstants.EmpireStringID].GetStringRepresentation());
                 }
             }
             

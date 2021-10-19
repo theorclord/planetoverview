@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PlanetOverview.Data;
 using PlanetOverview.GameComponents;
 using PlanetOverview.PlanetComponents;
 using PlanetOverview.PlayerComponents;
@@ -18,7 +19,7 @@ namespace PlanetOverviewTest
             // Create new planet. Add Owner to it. 
             Planet testPlanet = new Planet
             {
-                Owner = new Player() { Name = "TestOwner", Faction = container.Factions[0], Credits = 100000 },
+                Owner = new Player() { Name = "TestOwner", Faction = container.IDFactions[AllConstants.EmpireStringID], Credits = 100000 },
                 SupportedGroundStructureAmount = 1,
             };
 
@@ -47,7 +48,7 @@ namespace PlanetOverviewTest
             // Create new planet. Add Owner to it. 
             Planet testPlanet = new Planet
             {
-                Owner = new Player() { Name = "TestOwner", Faction = container.Factions[0], Credits = 0 },
+                Owner = new Player() { Name = "TestOwner", Faction = container.IDFactions[AllConstants.EmpireStringID], Credits = 0 },
                 SupportedGroundStructureAmount = 1,
             };
 
