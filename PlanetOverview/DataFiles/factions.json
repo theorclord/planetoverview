@@ -1,5 +1,6 @@
 [
   {
+    "TextID": "Empire_Faction",
     "Name": "Empire",
     "Structures": [
       {
@@ -13,6 +14,7 @@
       },
       {
         "BuildEffortProvided": 0,
+        "TextID": "Imp_Refi",
         "Name": "Imperial Refinery",
         "Cost": 500,
         "BuildEffortCost": 750,
@@ -65,10 +67,12 @@
     ]
   },
   {
+    "TextID": "Rebellion_Faction",
     "Name": "Rebellion",
     "Structures": [
       {
         "BuildEffortProvided": 0,
+        "TextID": "Reb_Tra_Camp",
         "Name": "Rebellion Training Camp",
         "Cost": 0,
         "BuildEffortCost": 0,
@@ -78,6 +82,7 @@
       },
       {
         "BuildEffortProvided": 0,
+        "TextID": "Reb_Fac",
         "Name": "Rebellion Factory",
         "Cost": 0,
         "BuildEffortCost": 0,

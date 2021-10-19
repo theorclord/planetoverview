@@ -24,3 +24,6 @@ Split unit into space and land
 
 Movement:
 Add graph for moving between planets
+
+Map:
+Load planets from json file from map

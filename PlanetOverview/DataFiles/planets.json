@@ -1,0 +1,72 @@
+[
+  {
+    "Name": "Center",
+    "FactionOwnerTextID": "Empire_Faction",
+    "BaseIncome": 800,
+    "BaseBuildEffort": 500,
+    "SupportedSpaceStationLevel": 4,
+    "SupportedGroundStructureAmount": 5,
+    "Coords": {
+      "X": 0,
+      "Y": 0
+    },
+    "PlanetStructuresIDs": [
+      "Imp_Bar",
+      "Imp_Fac",
+      "Imp_Refi"
+    ]
+  },
+  {
+    "Name": "North First",
+    "FactionOwnerTextID": "Empire_Faction",
+    "BaseIncome": 250,
+    "BaseBuildEffort": 500,
+    "SupportedSpaceStationLevel": 2,
+    "SupportedGroundStructureAmount": 3,
+    "Coords": {
+      "X": 0,
+      "Y": 1
+    }
+  },
+  {
+    "Name": "North Second Left",
+    "FactionOwnerTextID": "Rebellion_Faction",
+    "BaseIncome": 300,
+    "BaseBuildEffort": 500,
+    "SupportedSpaceStationLevel": 1,
+    "SupportedGroundStructureAmount": 4,
+    "Coords": {
+      "X": -1,
+      "Y": 2
+    },
+    "PlanetStructuresIDs": [
+      "Reb_Tra_Camp"
+    ]
+  },
+  {
+    "Name": "North Second Right",
+    "BaseIncome": 400,
+    "BaseBuildEffort": 500,
+    "SupportedSpaceStationLevel": 3,
+    "SupportedGroundStructureAmount": 8,
+    "Coords": {
+      "X": 1,
+      "Y": 2
+    }
+  },
+  {
+    "Name": "South First",
+    "FactionOwnerTextID": "Rebellion_Faction",
+    "BaseIncome": 500,
+    "BaseBuildEffort": 500,
+    "SupportedSpaceStationLevel": 2,
+    "SupportedGroundStructureAmount": 6,
+    "Coords": {
+      "X": 0,
+      "Y": -1
+    },
+    "PlanetStructuresIDs": [
+      "Reb_Fac"
+    ]
+  }
+]

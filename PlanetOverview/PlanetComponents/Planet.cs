@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace PlanetOverview.PlanetComponents
 {
@@ -36,7 +37,6 @@ namespace PlanetOverview.PlanetComponents
         public int SupportedGroundStructureAmount { get; set; }
 
         public List<Planet> AdjacentPlanets { get; set; }
-
         public List<Structure> PlanetStructures { get; set; }
         public SpaceStation PlanetSpaceStation { get; set; }
 

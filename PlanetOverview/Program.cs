@@ -11,6 +11,7 @@ namespace PlanetOverview
 {
     class Program
     {
+        private static string empireStringID = "Empire_Faction";
         static void Main(string[] args)
         {
             Console.WriteLine("Creating simple planet system");
@@ -22,86 +23,41 @@ namespace PlanetOverview
             container.LoadFactionsJson();
 
             // Create sample players
-            Player p1 = new Player() { Name = "Player1", Faction = container.Factions[0], Credits = 500 };
+            Player p1 = new Player() { Name = "Player1", Faction = container.IDFactions[empireStringID], Credits = 500 };
             container.Players.Add(p1);
-            Player p2 = new Player() { Name = "Player2", Faction = container.Factions[1], Credits = 10000 };
+            Player p2 = new Player() { Name = "Player2", Faction = container.IDFactions["Rebellion_Faction"], Credits = 10000 };
             container.Players.Add(p2);
             //players.Add(new Player() { Name = "Neutral" }); try with neutral as null on planets
 
             // Create Planets
-            Planet center = new Planet()
-            {
-                Name = "Center",
-                SupportedGroundStructureAmount = 5,
-                SupportedSpaceStationLevel = 4,
-                Coords = new Location() { X = 0, Y = 0 },
-                Owner = container.Players[0],
-                Income = 800,
-                BaseBuildEffort = 500,
-            };
-            center.AddNewStructure(new Structure(container.Players[0].Faction.Structures[0]));
-            center.AddNewStructure(new Structure(container.Players[0].Faction.Structures[2]));
-            center.AddNewStructure(new Structure(container.Players[0].Faction.Structures[1]));
+            container.LoadPlanets();
+
+            Planet center = container.AllPlanets[0];
+            center.Owner = container.Players[0];
             center.AddNewLandUnit(container.Players[0].Faction.Units[0]);
             center.AddNewLandUnit(container.Players[0].Faction.Units[0]);
             center.AddNewLandUnit(container.Players[0].Faction.Units[1]);
             center.PlanetSpaceStation = new SpaceStation() { Level = 3 };
             center.AddNewUnitToSpaceArea(container.Players[0].Faction.Units[2]);
-            container.AllPlanets.Add(center);
-            Planet northFirst = new Planet()
-            {
-                Name = "North First",
-                SupportedGroundStructureAmount = 3,
-                SupportedSpaceStationLevel = 2,
-                Coords = new Location() { X = 0, Y = 1 },
-                Owner = container.Players[0],
-                Income = 250,
-                BaseBuildEffort = 500,
-            };
-            container.AllPlanets.Add(northFirst);
-            Planet northSecondLeft = new Planet()
-            {
-                Name = "North Second Left",
-                SupportedGroundStructureAmount = 4,
-                SupportedSpaceStationLevel = 1,
-                Coords = new Location() { X = -1, Y = 2 },
-                Owner = container.Players[1],
-                Income = 300,
-                BaseBuildEffort = 500,
-            };
-            northSecondLeft.AddNewStructure(new Structure(container.Players[1].Faction.Structures[0]));
+
+            Planet northFirst = container.AllPlanets[1];
+            northFirst.Owner = container.Players[0];
+
+            Planet northSecondLeft = container.AllPlanets[2];
+            northSecondLeft.Owner = container.Players[1];
             northSecondLeft.AddNewLandUnit(container.Players[1].Faction.Units[0]);
             northSecondLeft.AddNewUnitToSpaceArea(container.Players[1].Faction.Units[1]);
             northSecondLeft.AddNewUnitToSpaceArea(container.Players[1].Faction.Units[1]);
             northSecondLeft.AddNewUnitToSpaceArea(container.Players[1].Faction.Units[1]);
             northSecondLeft.PlanetSpaceStation = new SpaceStation() { Level = 1 };
-            container.AllPlanets.Add(northSecondLeft);
-            Planet northSecondRight = new Planet()
-            {
-                Name = "North Second Right",
-                SupportedGroundStructureAmount = 8,
-                SupportedSpaceStationLevel = 3,
-                Coords = new Location() { X = 1, Y = 2 },
-                Owner = null,
-                Income = 400,
-                BaseBuildEffort = 500,
-            };
-            container.AllPlanets.Add(northSecondRight);
-            Planet southFirst = new Planet()
-            {
-                Name = "South First",
-                SupportedGroundStructureAmount = 6,
-                SupportedSpaceStationLevel = 2,
-                Coords = new Location() { X = 0, Y = -1 },
-                Owner = container.Players[1],
-                Income = 500,
-                BaseBuildEffort = 500,
-            };
-            southFirst.AddNewStructure(new Structure(container.Players[1].Faction.Structures[1]));
+
+            Planet northSecondRight = container.AllPlanets[3];
+
+            Planet southFirst = container.AllPlanets[4];
+            southFirst.Owner = container.Players[1];
             southFirst.AddNewLandUnit(container.Players[1].Faction.Units[0]);
             southFirst.AddNewUnitToSpaceArea(container.Players[1].Faction.Units[1]);
             southFirst.PlanetSpaceStation = new SpaceStation() { Level = 2 };
-            container.AllPlanets.Add(southFirst);
 
             // Add connections 
             // Todo move to a collection of connections. Adding the weight of the rute
@@ -202,7 +158,7 @@ namespace PlanetOverview
                 // Debug and test checks
                 if(line == "save")
                 {
-                    container.SaveJsonRepresentationOfFactions();
+                    container.SaveJsonRepresentationGame();
                 }
 
                 if (line == "test")
@@ -223,10 +179,7 @@ namespace PlanetOverview
 
                 if (line == "l")
                 {
-                    Console.WriteLine(container.Factions[0].Structures[0].Name);
-                    Console.WriteLine(container.Factions[0].Structures[0].BuildEffortCost);
-                    Console.WriteLine(container.Factions[0].Structures[0].BuildEffortProvided);
-                    Console.WriteLine(container.Factions[0].Structures[0].Cost);
+                    Console.WriteLine(container.IDFactions[empireStringID].GetStringRepresentation());
                 }
             }
             
