@@ -27,3 +27,28 @@ Add graph for moving between planets
 
 Map:
 Load planets from json file from map
+
+Auto resolve:
+Auto resolve for poc
+Large ships have black health pool
+Fighters have red. 
+Dice to match
+
+Eks
+Acclamator ship
+4 black health
+//1 red attack die only maybe
+2 black attack die
+Tie fighter 
+1 red health
+1 red attack die
+
+Each die goes from 1-10
+10 is a crit and may cross over to other damage pools 
+Their hit ability depend on the ship?
+Or each die has a hit ratio
+Eks
+Red die
+1-6 nothing
+7-9 red damage
+10 all damage

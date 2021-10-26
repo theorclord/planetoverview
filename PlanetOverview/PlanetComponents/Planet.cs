@@ -1,10 +1,10 @@
-﻿using PlanetOverview.PlayerComponents;
+﻿using PlanetOverview.Data;
+using PlanetOverview.PlayerComponents;
 using PlanetOverview.UnitComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace PlanetOverview.PlanetComponents
 {
@@ -55,7 +55,7 @@ namespace PlanetOverview.PlanetComponents
         public Planet()
         {
             // Init planet tiles
-            int pSize = Constants.PlanetTileSize;
+            int pSize = AllConstants.PlanetTileSize;
             PlanetLandTiles = new List<Tile>(pSize);
             for(int i = 0; i< pSize; i++)
             {
@@ -63,7 +63,7 @@ namespace PlanetOverview.PlanetComponents
             }
 
             // Init the stacks on the planet. 
-            int sSize = Constants.SpaceTileSize;
+            int sSize = AllConstants.SpaceTileSize;
             PlanetSpaceLocations = new List<Stack>(sSize);
             for(int i = 0; i< sSize; i++)
             {
@@ -154,7 +154,7 @@ namespace PlanetOverview.PlanetComponents
 
             Owner.Credits -= unit.QueuedPrice;
 
-            if(BuildQueues[queueType].Count < Constants.BuildQueueLength)
+            if(BuildQueues[queueType].Count < AllConstants.BuildQueueLength)
             {
                 BuildQueues[queueType].Add(unit);
             }

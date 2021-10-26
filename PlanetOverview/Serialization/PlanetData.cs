@@ -1,7 +1,5 @@
 ﻿using PlanetOverview.PlanetComponents;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace PlanetOverview.Serialization
 {
@@ -26,13 +24,8 @@ namespace PlanetOverview.Serialization
         //public SpaceStation PlanetSpaceStation { get; set; }
 
         // Unit locations
-        /// <summary>
-        /// Each planet have a number of space locations which contains the unit stack
-        /// </summary>
         //public List<Stack> PlanetSpaceLocations { get; private set; }
         //public List<Tile> PlanetLandTiles { get; private set; }
-
-
 
         //public Dictionary<BuildQueueType, List<Unit>> BuildQueues { get; private set; }
     }

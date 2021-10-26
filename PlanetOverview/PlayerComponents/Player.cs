@@ -1,6 +1,4 @@
 ﻿using PlanetOverview.UnitComponents;
-using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace PlanetOverview.PlayerComponents
