@@ -1,4 +1,6 @@
-﻿namespace Assets.Pathfinding.Pathfinding
+﻿using PlanetOverview.PlanetComponents;
+
+namespace PlanetOverview.Pathfinding.Pathfinding
 {
     /// <summary>
     /// Holds the point in the path returned for the pathfinding algorithm
@@ -10,13 +12,13 @@
         /// </summary>
         public int Cost { get; set; }
         /// <summary>
-        /// Location coordinates
+        /// The planet on the path
         /// </summary>
-        public int[] Coord { get; set; }
-        public PathNode(int moveCost, int[] coordinate)
+        public Planet Planet { get; set; }
+        public PathNode(int moveCost, Planet planet)
         {
             Cost = moveCost;
-            Coord = coordinate;
+            Planet = planet;
         }
     }
 }

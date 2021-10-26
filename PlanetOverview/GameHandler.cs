@@ -1,4 +1,5 @@
 ﻿
+using PlanetOverview.Pathfinding.Pathfinding;
 using PlanetOverview.PlanetComponents;
 using PlanetOverview.UnitComponents;
 
@@ -12,6 +13,9 @@ namespace PlanetOverview
             // Check if you can find the end point to the targert planet
             // Else send closest to the targert planet
             // Change the Astar algorithm to fit this construction
+
+            var path = AStar.ShortestPath(startingPlanet, targetPlanet);
+
         }
     }
 }

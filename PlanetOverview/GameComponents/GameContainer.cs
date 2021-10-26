@@ -68,6 +68,7 @@ namespace PlanetOverview.GameComponents
             {
                 var tempPlanet = new Planet()
                 {
+                    TextID = pD.TextID,
                     Name = pD.Name,
                     Income = pD.BaseIncome,
                     BaseBuildEffort = pD.BaseBuildEffort,

@@ -14,6 +14,8 @@ namespace PlanetOverview
         static void Main(string[] args)
         {
             Console.WriteLine("Creating simple planet system");
+            // handler for the game logic
+            GameHandler handler = new GameHandler();
 
             // Container holding all gamme information
             GameContainer container = new GameContainer();
@@ -103,6 +105,7 @@ namespace PlanetOverview
 
             // Test area
 
+            handler.MoveStack(new Stack(), center, northSecondLeft);
             // Game loop
             // Get buildable from a planet
             // Build a building you can afford

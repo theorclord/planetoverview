@@ -1,5 +1,6 @@
 [
   {
+    "TextID": "Center_Planet",
     "Name": "Center",
     "FactionOwnerTextID": "Empire_Faction",
     "BaseIncome": 800,
@@ -17,6 +18,7 @@
     ]
   },
   {
+    "TextID": "North_First_Planet",
     "Name": "North First",
     "FactionOwnerTextID": "Empire_Faction",
     "BaseIncome": 250,
@@ -29,6 +31,7 @@
     }
   },
   {
+    "TextID": "North_Second_Left_Planet",
     "Name": "North Second Left",
     "FactionOwnerTextID": "Rebellion_Faction",
     "BaseIncome": 300,
@@ -44,6 +47,7 @@
     ]
   },
   {
+    "TextID": "North_Second_Right_Planet",
     "Name": "North Second Right",
     "BaseIncome": 400,
     "BaseBuildEffort": 500,
@@ -55,6 +59,7 @@
     }
   },
   {
+    "TextID": "South_First_Planet",
     "Name": "South First",
     "FactionOwnerTextID": "Rebellion_Faction",
     "BaseIncome": 500,

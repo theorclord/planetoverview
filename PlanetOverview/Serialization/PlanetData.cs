@@ -6,6 +6,7 @@ namespace PlanetOverview.Serialization
     public class PlanetData
     {
         // Identifiers
+        public string TextID { get; set; }
         public string Name { get; set; }
         public string FactionOwnerTextID { get; set; }
         public int BaseIncome { get; set; }

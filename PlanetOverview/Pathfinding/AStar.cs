@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Assets.Scripts.Utility;
+using PlanetOverview.PlanetComponents;
 
-namespace Assets.Pathfinding.Pathfinding
+namespace PlanetOverview.Pathfinding.Pathfinding
 {
     /// <summary>
     /// Shortest path finding algorithm moving towards goal. Non exhaustive
@@ -23,18 +25,6 @@ namespace Assets.Pathfinding.Pathfinding
         }
 
         /// <summary>
-        /// Does a given position exist in the array
-        /// </summary>
-        /// <param name="x">First index to be tested</param>
-        /// <param name="y">Second index to be tested</param>
-        /// <param name="array">Array to check if index are within bounds</param>
-        /// <returns></returns>
-        public static bool Exists(int x, int y, TerrainTile[,] array)
-        {
-            return x >= 0 && y >= 0 && x < array.GetLength(0) && y < array.GetLength(1);
-        }
-
-        /// <summary>
         /// Main method for getting the shortest path from one point to another
         /// </summary>
         /// <param name="terrainLayout">The given path matrix. Each field contains information on whether it is passable and the movement cost</param>
@@ -44,23 +34,14 @@ namespace Assets.Pathfinding.Pathfinding
         /// <param name="goalX">First target index</param>
         /// <param name="goalY">Second target index</param>
         /// <returns>Shortest path to target. Null if no goal could be found</returns>
-        public static List<PathNode> ShortestPath(TerrainTile[,] terrainLayout, bool[,] obstructed, int startX, int startY, int goalX, int goalY)
+        public static List<PathNode> ShortestPath(Planet startingPlanet, Planet targetPlanet)
         {
-            // initialize the distance matrix for route comparison
-            int[,] distanceMatrix = new int[terrainLayout.GetLength(0), terrainLayout.GetLength(1)];
-            for (int i = 0; i < distanceMatrix.GetLength(0); i++)
-            {
-                for (int j = 0; j < distanceMatrix.GetLength(1); j++)
-                {
-                    distanceMatrix[i, j] = -1;
-                }
-            }
-            // Start point has distance 0
-            distanceMatrix[startX, startY] = 0;
-
+            List<PathNode> distanceMatrix = new List<PathNode>();
             // Add start node
             PriorityQueueMin<Node> openSet = new PriorityQueueMin<Node>();
-            Node initial = new Node(startX, startY, 0, ManhattanDistance(startX, startY, goalX, goalY), terrainLayout[startX, startY].MoveGroup, terrainLayout[startX, startY].Movecost);
+            Node initial = new Node(startingPlanet, 0, 
+                ManhattanDistance(startingPlanet.Coords.X, startingPlanet.Coords.Y,
+                targetPlanet.Coords.X, targetPlanet.Coords.Y));
             openSet.Insert(initial);
 
             // run through the loop until the priority queue is empty
@@ -68,12 +49,13 @@ namespace Assets.Pathfinding.Pathfinding
             {
                 Node current = openSet.DelMin();
                 // if we have reached the goal, get and return the path
-                if (current.X == goalX && current.Y == goalY)
+                if (current.Planet == targetPlanet)
                 {
                     List<PathNode> path = new List<PathNode>();
                     while (current.Parent != null)
                     {
-                        path.Add(new PathNode(current.MoveCost, new int[] { current.X, current.Y }));
+                        // TODO change cost to path between planets
+                        path.Add(new PathNode(1, current.Planet));
                         current = current.Parent;
                     }
                     path.Reverse();
@@ -81,7 +63,7 @@ namespace Assets.Pathfinding.Pathfinding
                 }
 
                 // search all the neighbours
-                List<Node> neighbours = current.GenerateNeighbours(terrainLayout, obstructed, distanceMatrix, goalX, goalY);
+                List<Node> neighbours = current.GenerateNeighbours(targetPlanet, distanceMatrix);
                 openSet.InsertRange(neighbours);
             }
             // we failed to find the goal
@@ -95,22 +77,17 @@ namespace Assets.Pathfinding.Pathfinding
     /// </summary>
     public class Node : IComparable<Node>
     {
-        private TerrainTile.MoveType Type { get; set; }
+        public Planet Planet { get; set; }
         public Node Parent { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
         private int CostToGetHere { get; set; }
         private int EstimatedCostToGoal { get; set; }
-        public int MoveCost { get; set; }
+        //public int MoveCost { get; set; }
 
-        public Node(int x, int y, int costToGetHere, int estimatedCostToGoal, TerrainTile.MoveType type, int moveCost)
+        public Node(Planet planet, int costToGetHere, int estimatedCostToGoal)
         {
-            X = x;
-            Y = y;
+            Planet = planet;
             CostToGetHere = costToGetHere;
             EstimatedCostToGoal = estimatedCostToGoal;
-            Type = type;
-            MoveCost = moveCost;
         }
 
         /// <summary>
@@ -146,17 +123,13 @@ namespace Assets.Pathfinding.Pathfinding
         /// <param name="goalX">Target first index</param>
         /// <param name="goalY">Target second index</param>
         /// <returns></returns>
-        public List<Node> GenerateNeighbours(TerrainTile[,] terrainLayout, bool[,] obstructed, int[,] distanceMatrix, int goalX, int goalY)
+        public List<Node> GenerateNeighbours(Planet targetPlanet, List<PathNode> distanceMatrix)
         {
             List<Node> list = new List<Node>();
-            CreateAndAdd(X + 1, Y, goalX, goalY, terrainLayout, obstructed, distanceMatrix, list);
-            CreateAndAdd(X + 1, Y + 1, goalX, goalY, terrainLayout, obstructed, distanceMatrix, list);
-            CreateAndAdd(X + 1, Y - 1, goalX, goalY, terrainLayout, obstructed, distanceMatrix, list);
-            CreateAndAdd(X - 1, Y, goalX, goalY, terrainLayout, obstructed, distanceMatrix, list);
-            CreateAndAdd(X - 1, Y - 1, goalX, goalY, terrainLayout, obstructed, distanceMatrix, list);
-            CreateAndAdd(X - 1, Y + 1, goalX, goalY, terrainLayout, obstructed, distanceMatrix, list);
-            CreateAndAdd(X, Y + 1, goalX, goalY, terrainLayout, obstructed, distanceMatrix, list);
-            CreateAndAdd(X, Y - 1, goalX, goalY, terrainLayout, obstructed, distanceMatrix, list);
+            foreach(var p in Planet.AdjacentPlanets)
+            {
+                CreateAndAdd(p, targetPlanet, distanceMatrix, list);
+            }
 
             return list;
         }
@@ -164,85 +137,35 @@ namespace Assets.Pathfinding.Pathfinding
         /// <summary>
         /// Used for creating a node to add to the search algorithm if possible
         /// </summary>
-        /// <param name="newX">The new node's first index</param>
-        /// <param name="newY">The new node's second index</param>
-        /// <param name="goalX">The target node's first index</param>
-        /// <param name="goalY">The target node's second index</param>
-        /// <param name="terrainLayout">The total grid</param>
-        /// <param name="obstructed">Temporarily blocked tiles</param>
+        /// <param name="planet"></param>
+        /// <param name="targetPlanet"></param>
         /// <param name="distanceMatrix">The current calculation of the cost to get to the tiles</param>
         /// <param name="list">List passed for populating the resulting nodes</param>
-        private void CreateAndAdd(int newX, int newY, int goalX, int goalY, TerrainTile[,] terrainLayout,
-                                    bool[,] obstructed, int[,] distanceMatrix, List<Node> list)
+        private void CreateAndAdd(Planet planet, Planet targetPlanet, List<PathNode> distanceMatrix, List<Node> list)
         {
-            // Checks for out of bounds
-            if (AStar.Exists(newX, newY, terrainLayout))
-            {
-                bool passableTerrain = false;
-                int newCost = CostToGetHere + terrainLayout[newX, newY].Movecost;
-                int moveCost = terrainLayout[newX, newY].Movecost;
-                // If the tile is impassable or currently obstructed, do not create a node
-                if (Type == TerrainTile.MoveType.Impassable || terrainLayout[newX, newY].MoveGroup == TerrainTile.MoveType.Impassable ||
-                  obstructed[newX, newY])
-                {
-                    passableTerrain = false;
-                }
-                else
-                {
-                    // checks for move restrictions between different types
-                    switch (terrainLayout[newX, newY].MoveGroup)
-                    {
-                        case TerrainTile.MoveType.Flying:
-                            // TODO check stack for passable, if stack has flying
-                            passableTerrain = false;
-                            break;
-                        case TerrainTile.MoveType.Normal:
-                            if (Type == TerrainTile.MoveType.Normal || Type == TerrainTile.MoveType.Transition)
-                            {
-                                passableTerrain = true;
-                            }
-                            else
-                            {
-                                passableTerrain = false;
-                            }
-                            break;
-                        case TerrainTile.MoveType.Transition:
-                            if (Type == TerrainTile.MoveType.Transition || Type == TerrainTile.MoveType.WaterPassable || Type == TerrainTile.MoveType.Normal)
-                            {
-                                passableTerrain = true;
-                            }
-                            else
-                            {
-                                passableTerrain = false;
-                            }
-                            break;
-                        case TerrainTile.MoveType.WaterPassable:
-                            if (Type == TerrainTile.MoveType.Transition || Type == TerrainTile.MoveType.WaterPassable)
-                            {
-                                passableTerrain = true;
-                            }
-                            else
-                            {
-                                passableTerrain = false;
-                            }
-                            break;
-                    }
-                }
+            // if the planet already is in the list, don't add
+            // TODO change the weight of moving here
+            int newCost = CostToGetHere + 1;
 
-                // if the tile is not passable, do not make a node
-                if (passableTerrain)
+            // TODO check if you are capable of going through this planet's space
+            int newEstimate = AStar.ManhattanDistance(planet.Coords.X, planet.Coords.Y,
+                targetPlanet.Coords.X, targetPlanet.Coords.Y);
+            var pathNode = distanceMatrix.FirstOrDefault(x => x.Planet.TextID == planet.TextID);
+            Node newNode = new Node(planet, newCost, newEstimate)
+            {
+                Parent = this
+            };
+            if (pathNode != null)
+            {
+                if(newCost < pathNode.Cost)
                 {
-                    int newEstimate = AStar.ManhattanDistance(newX, newY, goalX, goalY);
-                    Node newNode = new Node(newX, newY, newCost, newEstimate, terrainLayout[newX, newY].MoveGroup, moveCost)
-                    {
-                        Parent = this
-                    };
-                    if (distanceMatrix[newX, newY] < 0 || newCost < distanceMatrix[newX, newY])
-                    {
-                        list.Add(newNode);
-                        distanceMatrix[newX, newY] = newCost;
-                    }
+                    pathNode.Cost = newCost;
+                    list.Add(newNode);
                 }
+            } else
+            {
+                distanceMatrix.Add(new PathNode(newCost, planet));
+                list.Add(newNode);
             }
         }
     }

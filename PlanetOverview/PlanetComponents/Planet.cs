@@ -51,6 +51,7 @@ namespace PlanetOverview.PlanetComponents
         public int BaseBuildEffort { get; set; }
 
         public Dictionary<BuildQueueType,List<Unit>> BuildQueues { get; private set; }
+        public string TextID { get; internal set; }
 
         public Planet()
         {
