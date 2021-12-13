@@ -3,6 +3,9 @@ Move stack from one planet to another
 Run a build and order loop from terminal
 Implement simple auto resolve
 
+Move the pathfinding an isolated location such that the logic works independent of the solution specific logic
+add the pathfinding to the baisc components repository.
+
 TODOs:
 Buildqueues:
 Building new units. How to handle space area being occupied by enemy fleet
