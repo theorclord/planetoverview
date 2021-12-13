@@ -1,3 +1,10 @@
+Minimal vialable product goals:
+Have two sides which can build units on their planets.
+Move the units.
+Conduct combat (auto resolve)
+Continue till one is defeated
+
+
 New functionality:
 Move stack from one planet to another
 Run a build and order loop from terminal
