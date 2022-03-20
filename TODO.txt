@@ -1,3 +1,14 @@
+Notes:
+get all buildable structures:
+Grey out those who you can't afford
+And those you can't build per requirements
+
+Go for a total war approach where the buildings which are locked are show, but not available in a tech tree?
+- This just mean allocating to a queue for structures -> one tile available buildings.
+
+Go for star wars
+List of buildings you can afford and which are available. Those you can't afford are greyed out.
+
 Minimal vialable product goals:
 Have two sides which can build units on their planets.
 Move the units.
